@@ -1,0 +1,27 @@
+/* home.css */
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: rgb(36, 36, 36); /* Change this to your desired background color */
+}
+
+.search-container {
+    text-align: center;
+    margin-top: 200px;
+}
+
+#search-bar {
+    padding: 10px 20px; /* Increase padding for a bigger input field */
+    width: 500px; /* Increase width for a wider input field */
+    font-size: 20px; /* Increase font size */
+    border-radius: 105px; /* Add border-radius for a rounded shape */
+    border: 3px solid #ccc; /* Add border to make it stand out */
+    outline: none; /* Remove default outline */
+    font-family: Tahoma, Geneva, sans-serif; /* Change font to Tahoma */
+}
+
+#search-bar:focus {
+    border-color: rgb(138, 36, 255); /* Change border color on focus */
+    box-shadow: 0 0 5px rgb(138, 36, 255); /* Add box shadow for focus effect */
+    transition: border-color 0.5s cubic-bezier(0.645, 0.045, 0.355, 1); /* Add transition effect with cubic-bezier timing function */
+}
