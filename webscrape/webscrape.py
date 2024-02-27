@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
+from sqlalchemy import create_engine
 
 # URL of the NBA players statistics page on Basketball-Reference
 url = 'https://www.basketball-reference.com/leagues/NBA_2022_per_game.html'
@@ -32,7 +33,12 @@ if response.status_code == 200:
     # Convert the list of player data into a DataFrame
     df = pd.DataFrame(player_data, columns=headers)
     
-    # Print the DataFrame
-    print(df)
-else:
-    print('Failed to retrieve data. Status code:', response.status_code)
+    username = 'eric'
+    password = 'nomeat555'
+    host = 'localhost'  # or your host, e.g., '127.0.0.1'
+    database = 'killjohn'
+
+    # Create a MySQL engine
+    engine = create_engine(f'mysql+pymysql://{username}:{password}@{host}/{database}')
+
+    df.to_sql('stats', con=engine, if_exists='replace', index=False)
