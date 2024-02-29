@@ -33,7 +33,7 @@ def name_search(name):
                 WHERE Player LIKE '{name}%'
                 GROUP BY Player
             ) AS SUB
-        ORDER BY PTS DESC;
+        ORDER BY CAST(PTS AS SIGNED) DESC LIMIT 10;
     """
     
 
