@@ -1,8 +1,26 @@
-// Function to handle input in the search bar
-function handleSearchInput(event) {
-    const query = event.target.value.trim(); // Trim to remove leading/trailing spaces
-    console.log("Search query:", query);
+function fetchSearchResults(query) {
+    fetch('/search', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ query: query }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Handle the search results
+        console.log("Search results:", data.results);
+    })
+    .catch(error => {
+        console.error('Error fetching search results:', error);
+    });
 }
 
-// Event listener for input changes in the search bar
-document.getElementById('search-bar').addEventListener('input', handleSearchInput);
+document.getElementById('search-bar').addEventListener('input', function(event) {
+    const query = event.target.value.trim();
+    if (query !== '') {
+        fetchSearchResults(query);
+    } else {
+        console.log("Search query is empty.");
+    }
+});

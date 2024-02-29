@@ -27,8 +27,8 @@ def execute_query(conn, query):
 def search(name):
     sql_query = f"""
         SELECT * FROM stats_23_24
-        WHERE player_name LIKE '{name}%'
-        ORDER BY points_per_game DESC
+        WHERE Player LIKE '{name}%'
+        ORDER BY CAST(PTS AS SIGNED) DESC
         LIMIT 10
     """
 
@@ -39,3 +39,5 @@ def search(name):
         results = execute_query(conn, sql_query)
         conn.close()
     return results
+
+print(search("L"))
