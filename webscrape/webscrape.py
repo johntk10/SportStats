@@ -4,7 +4,7 @@ import pandas as pd
 from sqlalchemy import create_engine
 
 # URL of the NBA players statistics page on Basketball-Reference
-url = 'https://www.basketball-reference.com/leagues/NBA_2022_per_game.html'
+url = 'https://www.basketball-reference.com/leagues/NBA_2024_per_game.html'
 
 # Send a GET request to the URL
 response = requests.get(url)
@@ -35,10 +35,10 @@ if response.status_code == 200:
     
     username = 'eric'
     password = 'nomeat555'
-    host = 'localhost'  # or your host, e.g., '127.0.0.1'
-    database = 'killjohn'
+    host = '96.38.123.26'  # or your host, e.g., '127.0.0.1'
+    database = 'basketballstats'
 
     # Create a MySQL engine
     engine = create_engine(f'mysql+pymysql://{username}:{password}@{host}/{database}')
 
-    df.to_sql('stats', con=engine, if_exists='replace', index=False)
+    df.to_sql('stats_23-24', con=engine, if_exists='replace', index=False)
