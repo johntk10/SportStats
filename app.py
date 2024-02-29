@@ -12,7 +12,7 @@ def home():
 def search():
     query_string = request.json.get('query', '')
     # Call the Python function to execute the query
-    results = query.search(query_string)
+    results = query.name_search(query_string)
     # Return the results as JSON
     return jsonify(results=results)
 

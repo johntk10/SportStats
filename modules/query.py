@@ -24,7 +24,28 @@ def execute_query(conn, query):
     except mysql.connector.Error as err:
         print("Error executing query:", err)
 
-def search(name):
+def name_search(name):
+    sql_query = f"""
+        SELECT Player
+            FROM (
+                SELECT DISTINCT Player, MAX(PTS) AS PTS
+                FROM stats_23_24
+                WHERE Player LIKE '{name}%'
+                GROUP BY Player
+            ) AS SUB
+        ORDER BY PTS DESC;
+    """
+    
+
+    conn = connect_to_database()
+
+    results = []
+    if conn:
+        results = execute_query(conn, sql_query)
+        conn.close()
+    return results
+
+def stat_search(name):
     sql_query = f"""
         SELECT * FROM stats_23_24
         WHERE Player LIKE '{name}%'
