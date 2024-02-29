@@ -39,5 +39,3 @@ def search(name):
         results = execute_query(conn, sql_query)
         conn.close()
     return results
-
-print(search("L"))

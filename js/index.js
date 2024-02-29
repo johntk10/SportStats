@@ -8,7 +8,7 @@ function fetchSearchResults(query) {
     })
     .then(response => response.json())
     .then(data => {
-        // Handle the search results
+        // Output the search results to the console
         console.log("Search results:", data.results);
     })
     .catch(error => {
@@ -19,6 +19,7 @@ function fetchSearchResults(query) {
 document.getElementById('search-bar').addEventListener('input', function(event) {
     const query = event.target.value.trim();
     if (query !== '') {
+        // Call the fetchSearchResults function with the search query
         fetchSearchResults(query);
     } else {
         console.log("Search query is empty.");
