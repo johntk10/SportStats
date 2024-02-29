@@ -34,6 +34,7 @@ def search(name):
 
     conn = connect_to_database()
 
+    results = []
     if conn:
         results = execute_query(conn, sql_query)
         conn.close()
