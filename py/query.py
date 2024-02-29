@@ -24,27 +24,17 @@ def execute_query(conn, query):
     except mysql.connector.Error as err:
         print("Error executing query:", err)
 
+def search(name):
+    sql_query = f"""
+        SELECT * FROM stats_23_24
+        WHERE player_name LIKE '{name}%'
+        ORDER BY points_per_game DESC
+        LIMIT 10
+    """
 
-
-
-# Example usage
-if __name__ == "__main__":
-    # Connect to the database
     conn = connect_to_database()
 
     if conn:
-        print("Connected to database.")
-        query = "SELECT * FROM stats_23_24 LIMIT 10"
-        result = execute_query(conn, query)
-        
-        # Print the results
-        if result:
-            for row in result:
-                print(row)
-        else:
-            print("No results found.")
-
-        # Close the database connection
+        results = execute_query(conn, sql_query)
         conn.close()
-    else:
-        print("Failed to connect to the database.")
+    return results
