@@ -16,11 +16,11 @@ def search():
     # Return the results as JSON
     return jsonify(results=results)
 
-@app.route('/playerInfo')
-def playerInfo():
+@app.route('/playerInfo/<name>')
+def playerInfo(name):
    conn = query.connect_to_database()
    sql_query = f"""SELECT * FROM stats_23_24
-                  WHERE player = 'Lebron James' """
+                  WHERE player = '{name}' """
                   
    results = query.execute_query(conn, sql_query)
 
