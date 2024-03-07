@@ -6,6 +6,9 @@ app = Flask(__name__)
 # Define your routes
 @app.route('/')
 def home():
+    # conn = query.connect_to_database()
+    # sql_query = f""" """
+
     return render_template('home.html')
 
 @app.route('/search', methods=['POST'])
@@ -27,7 +30,7 @@ def playerInfo(name):
         sql_query = f"""SELECT Pos, Tm, G, MP, FG, FGA,
                         `FG%`, 3P, 3PA, `3P%`, FT, FTA, `FT%`, 
                         TRB, AST, STL, BLK, TOV, PTS FROM {table}
-                        WHERE player = '{name}' AND Tm != 'Tot' """
+                        WHERE player = "{name}" AND Tm != 'Tot' """
                   
         results = query.execute_query(conn, sql_query)
         all_results[table] = results
@@ -40,11 +43,12 @@ def playerInfo(name):
     # last_games_sql_query = f"""SELECT Pos, Tm, G, MP, FG, FGA,
     #                             `FG%`, 3P, 3PA, `3P%`, FT, FTA, `FT%`, 
     #                             TRB, AST, STL, BLK, TOV, PTS FROM 'last_5_games' 
-    #                             WHERE player = '{name}' """
+    #                             WHERE player = "{name}" """
     
     # five_games = query.execute_query(conn, last_games_sql_query)
     full_image_url = "http://cdn.ssref.net/scripts/image_resize.cgi?min=200&url=" + image_url[0][0]
-    return render_template('playerInfo.html', total_stats = all_results, image = full_image_url)
+
+    return render_template('playerInfo.html', total_stats = all_results, image = full_image_url, name = name)
 
 if __name__ == '__main__':
     app.run(debug=True)

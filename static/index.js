@@ -57,3 +57,5 @@ const debouncedShowResults = debounce(showResults, 300);
 document.getElementById('search-bar').addEventListener('input', function(event) {
     debouncedShowResults(event.target.value);
 });
+
+

@@ -3,12 +3,12 @@
 <head>
    <meta charset="UTF-8">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-   <title>New Website Title</title>
+   <link rel="stylesheet" href="{{ url_for('static', filename='playerInfo.css') }}">
 </head>
 <body>
    <!-- {{ results }} -->
    <img src="{{ image }}">
+   <a> {{ name }} </a>
    <div class seasonStats-table>
       <table> 
          <thead>
@@ -66,7 +66,37 @@
       </table>
    </div>
    <div class last5games_table>
-
+      <!-- <table> 
+         <thead>
+            <tr> 
+               <th scope ="col"> Date</th>
+               <th scope ="col"> Team</th>
+               <th scope ="col"> </th>
+               <th scope ="col"> OPP</th>
+               <th scope ="col"> Result</th>
+               <th scope ="col"> MP</th>
+               <th scope ="col"> FGM</th>
+               <th scope ="col"> FGA</th>
+               <th scope ="col"> FG%</th>
+               <th scope ="col"> 3PM</th>
+               <th scope ="col"> 3PA%</th>
+               <th scope ="col"> 3P%</th>
+               <th scope ="col"> FTM</th>
+               <th scope ="col"> FTA</th>
+               <th scope ="col"> FT%</th>
+               <th scope ="col"> ORB</th>
+               <th scope ="col"> DRB</th>
+               <th scope ="col"> TRB</th>
+               <th scope ="col"> AST</th>
+               <th scope ="col"> STL</th>
+               <th scope ="col"> BLK</th>
+               <th scope ="col"> TOV</th>
+               <th scope ="col"> PF</th>
+               <th scope ="col"> PTS</th>
+               <th scope ="col"> GmSc</th>
+               <th scope ="col"> +/-</th>
+            </tr>
+         </thead> -->
 
    </div>
 
