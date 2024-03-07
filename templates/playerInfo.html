@@ -3,10 +3,72 @@
 <head>
    <meta charset="UTF-8">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
    <title>New Website Title</title>
 </head>
 <body>
-   {{ results }}
+   <!-- {{ results }} -->
+   <img src="{{ image }}">
+   <div class seasonStats-table>
+      <table> 
+         <thead>
+            <tr> 
+               <th scope ="col"> Season</th>
+               <th scope ="col"> Pos</th>
+               <th scope ="col"> Team</th>
+               <th scope ="col"> GP</th>
+               <th scope ="col"> MPG</th>
+               <th scope ="col"> FGM</th>
+               <th scope ="col"> FGA</th>
+               <th scope ="col"> FG%</th>
+               <th scope ="col"> 3PM</th>
+               <th scope ="col"> 3PA%</th>
+               <th scope ="col"> 3P%</th>
+               <th scope ="col"> FTM</th>
+               <th scope ="col"> FTA</th>
+               <th scope ="col"> FT%</th>
+               <th scope ="col"> REB</th>
+               <th scope ="col"> AST</th>
+               <th scope ="col"> STL</th>
+               <th scope ="col"> BLK</th>
+               <th scope ="col"> TOV</th>
+               <th scope ="col"> PTS</th>
+            </tr>
+         </thead>
+         <tbody>
+            {% for table, results in total_stats.items() %}
+               {% for row in results %}
+                  <tr>
+                     <td>{{ table }}</td>
+                     <td>{{ row[0] }}</td>
+                     <td>{{ row[1] }}</td>
+                     <td>{{ row[2] }}</td>
+                     <td>{{ row[3] }}</td>
+                     <td>{{ row[4] }}</td>
+                     <td>{{ row[5] }}</td>
+                     <td>{{ row[6] }}</td>
+                     <td>{{ row[7] }}</td>
+                     <td>{{ row[8] }}</td>
+                     <td>{{ row[9] }}</td>
+                     <td>{{ row[10] }}</td>
+                     <td>{{ row[11] }}</td>
+                     <td>{{ row[12] }}</td>
+                     <td>{{ row[13] }}</td>
+                     <td>{{ row[14] }}</td>
+                     <td>{{ row[15] }}</td>
+                     <td>{{ row[16] }}</td>
+                     <td>{{ row[17] }}</td>
+                     <td>{{ row[18] }}</td>
+                  </tr>
+               {% endfor %}
+            {% endfor %}
+         </tbody>
+      </table>
+   </div>
+   <div class last5games_table>
+
+
+   </div>
 
 </body>
 </html>
