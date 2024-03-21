@@ -2,63 +2,54 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 from sqlalchemy import create_engine
-
-
-# Get the active player ids
-def scrape_active_player_ids():
-    base_url = 'https://www.basketball-reference.com/players/'
-    active_player_ids = []
-    # Basketball-Reference has pages for players sorted by the first letter of their surname
-    for letter in 'abcdefghijklmnopqrstuvwxyz':
-        response = requests.get(f'{base_url}{letter}/')
-        if response.status_code == 200:
-            soup = BeautifulSoup(response.content, 'html.parser')
-            # Find all player links; active players are in bold
-            for player in soup.find_all('strong'):
-                link = player.find('a')
-                if link and 'href' in link.attrs:
-                    player_id = link.attrs['href'].split('/')[3].replace('.html', '')
-                    active_player_ids.append(player_id)
-    return active_player_ids
-
+import time
 
 # Function to get the last 5 games for a single player
 def get_last_5_games(player_id):
-    url = f'https://www.basketball-reference.com/players/{player_id}/gamelog/2024'
+    #https://www.basketball-reference.com/players/a/achiupr01.html
+    url = f'https://www.basketball-reference.com/players/{player_id[0]}/{player_id}.html'
+    print(url)
+    #url = f'https://www.basketball-reference.com/players/{player_id}/gamelog/2024'
     response = requests.get(url)
+    time.sleep(3)
+    print(response.status_code)
     if response.status_code == 200:
         soup = BeautifulSoup(response.content, 'html.parser')
-        table = soup.find('table', {'id': 'pgl_basic'})  # Adjust if the table ID is different
+        table = soup.find('table', {'id': 'last5'})
         player_data = []
         if table:  # Check if the table is found
-            rows = table.find('tbody').find_all('tr')[-5:]  # Get the last 5 rows for the games
+            # Get the last 5 rows for the games
+            rows = table.find('tbody').find_all('tr')
             for row in rows:
-                if 'thead' not in row.get('class', []):  # This filters out header rows in the data
-                    player_row = [td.text.strip() for td in row.find_all(['th', 'td'])]
-                    player_data.append(player_row)
+                # Extracting data from each cell
+                player_row = [td.get_text(strip=True) for td in row.find_all(['th', 'td'])]
+                player_data.append(player_row)
         return player_data
     return []
-
-
-player_ids = scrape_active_player_ids()
 
 # Initialize an empty list to store all players' data
 all_players_data = []
 
-
 # Column headers, adjust according to the actual table you're scraping
-headers = ['Player', 'Date', 'Opp', 'Result', 'GS', 'MP', 'FG', 'FGA', 'FG%', '3P', '3PA', '3P%', 'FT', 'FTA', 'FT%', 'ORB', 'DRB', 'TRB', 'AST', 'STL', 'BLK', 'TOV', 'PF', 'PTS', '+/-']
-print("HERE")
+headers = ['Player', 'Date', 'Team', '@', 'Opp', 'Result', 'GS', 'MP', 'FG', 'FGA', 'FG%', '3P', '3PA', '3P%', 'FT', 'FTA', 'FT%', 'ORB', 'DRB', 'TRB', 'AST', 'STL', 'BLK', 'TOV', 'PF', 'PTS', 'GmSc', '+/-']
+print(len(headers))
+
+player_ids = []
+with open('active_player_ids.txt', 'r') as file:  # Ensure the file is named 'player_ids.txt' and located in the correct directory
+    player_ids = [line.strip() for line in file.readlines()]
+
+#print(player_ids)
 
 for player_id in player_ids:
     player_games = get_last_5_games(player_id)
+    #print(player_games)
     for game in player_games:
         all_players_data.append([player_id] + game)  # Add player ID to each game data
-
+        print(all_players_data)
+print(all_players_data)
 
 # Convert the list of player data into a DataFrame
 df = pd.DataFrame(all_players_data, columns=headers)
-
 
 # Database connection parameters
 
