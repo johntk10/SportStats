@@ -11,6 +11,7 @@ host = '96.38.123.26'  # or your host, e.g., '127.0.0.1'
 database = 'basketballstats'
 
 
+
 def getTable():
 # URL of the NBA players statistics page on Basketball-Reference
     url = 'https://www.basketball-reference.com/leagues/NBA_2024_per_game.html'
@@ -100,6 +101,5 @@ def add_image():
 
     else:
         print("failure")
-
 
 

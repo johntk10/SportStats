@@ -65,13 +65,16 @@
          </tbody>
       </table>
    </div>
+   <br> 
+   <br>
+   <br>
    <div class last5games_table>
-      <!-- <table> 
+      <table> 
          <thead>
             <tr> 
                <th scope ="col"> Date</th>
                <th scope ="col"> Team</th>
-               <th scope ="col"> </th>
+               <th scope ="col"> @</th>
                <th scope ="col"> OPP</th>
                <th scope ="col"> Result</th>
                <th scope ="col"> MP</th>
@@ -96,8 +99,40 @@
                <th scope ="col"> GmSc</th>
                <th scope ="col"> +/-</th>
             </tr>
-         </thead> -->
-
+         </thead>
+         <tbody>
+            {% for row in five_games %}
+            <tr>
+               <td>{{ row[0] }}</td>
+               <td>{{ row[1] }}</td>
+               <td>{{ row[2] }}</td>
+               <td>{{ row[3] }}</td>
+               <td>{{ row[4] }}</td>
+               <td>{{ row[5] }}</td>
+               <td>{{ row[6] }}</td>
+               <td>{{ row[7] }}</td>
+               <td>{{ row[8] }}</td>
+               <td>{{ row[9] }}</td>
+               <td>{{ row[10] }}</td>
+               <td>{{ row[11] }}</td>
+               <td>{{ row[12] }}</td>
+               <td>{{ row[13] }}</td>
+               <td>{{ row[14] }}</td>
+               <td>{{ row[15] }}</td>
+               <td>{{ row[16] }}</td>
+               <td>{{ row[17] }}</td>
+               <td>{{ row[18] }}</td>
+               <td>{{ row[19] }}</td>
+               <td>{{ row[20] }}</td>
+               <td>{{ row[21] }}</td>
+               <td>{{ row[22] }}</td>
+               <td>{{ row[23] }}</td>
+               <td>{{ row[24] }}</td>
+               <td>{{ row[25] }}</td>
+               <td>{{ row[26] }}</td>
+            </tr>
+            {% endfor %}
+         </tbody>
    </div>
 
 </body>
