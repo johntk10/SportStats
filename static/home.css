@@ -55,3 +55,18 @@ body {
 .search-results:not(:empty) {
     display: block;
 }
+
+.box {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 10px;
+    width: 200px;
+    height: 100px;
+    background-color: #f9f9f9;
+    display: inline-block;
+}   
+  
+  /* Additional styling for the content within the boxes */
+.box h2 {
+    margin-top: 0;
+}

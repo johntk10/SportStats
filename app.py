@@ -6,10 +6,18 @@ app = Flask(__name__)
 # Define your routes
 @app.route('/')
 def home():
-    # conn = query.connect_to_database()
-    # sql_query = f""" """
-
-    return render_template('home.html')
+    conn = query.connect_to_database()
+    sql_query = f"""SELECT Team, MIN(Opp) AS Opponent, MIN(Result) AS Result 
+                    FROM `last_5_games`
+                    WHERE Date = "2024-03-20"
+                    GROUP BY Team
+                    ORDER BY Result DESC """
+    results = query.execute_query(conn, sql_query)
+    for result in results:
+        for result2 in results:
+            if result[0] == result2[1]:
+                results.remove(result2)
+    return render_template('home.html', results = results, count = len(results))
 
 @app.route('/search', methods=['POST'])
 def search():
@@ -50,6 +58,23 @@ def playerInfo(name):
     full_image_url = "http://cdn.ssref.net/scripts/image_resize.cgi?min=200&url=" + image_url[0][0]
 
     return render_template('playerInfo.html', total_stats = all_results, image = full_image_url, name = name, five_games = five_games)
+
+@app.route('/gameInfo/<team>/vs/<opp>')
+def gameInfo(team, opp):
+    conn = query.connect_to_database()
+    sql_query = f"""SELECT * FROM `last_5_games`
+                    WHERE Date = "2024-03-20" 
+                    AND (Team = "{team}" OR Team = "{opp}")
+                    ORDER BY Team """
+    teams = query.execute_query(conn, sql_query)
+    team1 = []
+    team2 = []
+    for t in teams: 
+        if(t[2] != team):
+            team2.append(t)
+        else: team1.append(t)
+
+    return render_template('gameInfo.html', team1 = team1, team2 = team2)
 
 if __name__ == '__main__':
     app.run(debug=True)

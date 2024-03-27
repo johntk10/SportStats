@@ -18,7 +18,14 @@
     <script type="text/javascript" src="{{ url_for('static', filename='index.js') }}"></script>
 
     <div class="yesterday-games"> 
-        
+        <h2> {{count}} Games Yesterday </h2>
+        {% for result in results %}
+        <!-- Box for each result -->
+        <div class="box">
+        <h2>{{ result[0] }} vs {{ result[1] }}</h2>
+        <p> {{ result[2] }}</p>
+        </div>
+        {% endfor %}
 
     </div>
 </body>

@@ -103,3 +103,40 @@ def add_image():
         print("failure")
 
 
+def getLineScore(): 
+    url = "https://www.basketball-reference.com/boxscores/?month=03&day=19&year=2024"
+    response = requests.get(url)
+    #print(response.status_code)
+# Check if the request was successful (status code 200)
+    if response.status_code == 200:
+        # Parse the HTML content of the page
+        soup = BeautifulSoup(response.content, 'html.parser')
+        td_elements = soup.find_all('td', class_='center')
+        counter = 0
+
+        for td in td_elements:
+            
+            if counter % 4 == 0:
+                counter = 0
+                previous = td.find_previous_sibling()
+                previous_href = previous.find('a')['href']
+                team = previous_href.split('teams/')[-1].split('/')[0]
+                print(team)
+
+            counter += 1
+            score = td.get_text(strip=True)
+            quarter = f"q{counter}_teamScoring"
+            conn = q.connect_to_database()
+            sql_query = f"""UPDATE basketballstats.last_5_games
+                            SET {quarter} = "{score}"
+                            WHERE Date = "2024-03-19" 
+                            AND Team = "{team}" AND {quarter} IS NULL"""
+            
+            cursor = conn.cursor()
+            cursor.execute(sql_query)
+            conn.commit()
+            cursor.close()
+            conn.close()
+            print(quarter, score)
+            
+        
