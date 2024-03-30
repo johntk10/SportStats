@@ -20,12 +20,81 @@
     <div class="yesterday-games"> 
         <h2> {{count}} Games Yesterday </h2>
         {% for result in results %}
-        <!-- Box for each result -->
         <div class="box">
-        <h2>{{ result[0] }} vs {{ result[1] }}</h2>
-        <p> {{ result[2] }}</p>
+            <div class="team-info">
+                <h3>{{ result.team1 }}</h3>
+                <p> {{ result.team1_score }}</p> 
+                <a href = "gameInfo/{{result.team1}}/vs/{{result.team2}}">{{ result.outcome }} </a> 
+            </div>
+            <div class="team-info">
+                <h3>{{ result.team2 }}</h3> 
+                <p>{{ result.team2_score }}</p> 
+                <a>{{ result.outcome }}</a>
+            </div>
+            <hr>
+            <div class="quarter-scoring">
+              <h4> </h4>
+              <p>1</p>
+              <p>2</p>
+              <p>3</p>
+              <p>4</p>
+              {% if result.team1_ot1_scoring is not none %}
+              <p>OT</p>
+              {% endif %}
+              {% if result.team1_ot2_scoring is not none %}
+              <p>2OT</p>
+              {% endif %}
+            </div>
+            <div class="quarter-scoring">
+              <h4>{{ result.team1 }}</h4>
+              <p>{{ result.team1_q1_scoring }}</p>
+              <p>{{ result.team1_q2_scoring }}</p>
+              <p>{{ result.team1_q3_scoring }}</p>
+              <p>{{ result.team1_q4_scoring }}</p>
+              {% if result.team1_ot1_scoring is not none %}
+              <p>{{ result.team1_ot1_scoring }}</p>
+              {% endif %}
+              {% if result.team1_ot2_scoring is not none %}
+              <p>{{ result.team1_ot2_scoring }}</p>
+              {% endif %}
+            </div>
+            <div class="quarter-scoring">
+              <h4>{{ result.team2 }}</h4>
+              <p>{{ result.team2_q1_scoring }}</p>
+              <p>{{ result.team2_q2_scoring }}</p>
+              <p>{{ result.team2_q3_scoring }}</p>
+              <p>{{ result.team2_q4_scoring }}</p>
+              {% if result.team2_ot1_scoring is not none %}
+              <p>{{ result.team2_ot1_scoring }}</p>
+              {% endif %}
+              {% if result.team2_ot2_scoring is not none %}
+              <p>{{ result.team2_ot2_scoring }}</p>
+              {% endif %}
+          </div>
         </div>
         {% endfor %}
+        <!-- <table>
+            <thead>
+              <tr>
+                <th>Away Team</th>
+                <th>Away Score</th>
+                <th>Home Team</th>
+                <th>Home Score</th>
+                <th>Outcome</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for game in results %}
+              <tr>
+                <td>{{ game.away_team }}</td>
+                <td>{{ game.away_score }}</td>
+                <td>{{ game.home_team }}</td>
+                <td>{{ game.home_score }}</td>
+                <td>{{ game.outcome }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table> -->
 
     </div>
 </body>

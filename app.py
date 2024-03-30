@@ -3,21 +3,64 @@ import modules.query as query
 
 app = Flask(__name__)
 
+
+def process_data(raw_data):
+    processed_data = []
+    for game in raw_data:
+        team1, team2, result, *quarter_scores = game = game
+        result_parts = result.split()
+        outcome = result_parts[0]  # Win or Loss
+        scores = result_parts[1].split('-')  # Split scores
+        processed_data.append({
+            'team1': team1,
+            'team1_score': scores[0],
+            'team2': team2,
+            'team2_score': scores[1],
+            'outcome': 'W',
+            'team1_q1_scoring': quarter_scores[0],
+            'team1_q2_scoring': quarter_scores[1],
+            'team1_q3_scoring': quarter_scores[2],
+            'team1_q4_scoring': quarter_scores[3],
+            'team1_ot1_scoring': quarter_scores[4] if len(quarter_scores) > 4 else None,
+            'team1_ot2_scoring': quarter_scores[5] if len(quarter_scores) > 5 else None,
+            'team2_q1_scoring': quarter_scores[6],
+            'team2_q2_scoring': quarter_scores[7],
+            'team2_q3_scoring': quarter_scores[8],
+            'team2_q4_scoring': quarter_scores[9],
+            'team2_ot1_scoring': quarter_scores[10] if len(quarter_scores) > 10 else None,
+            'team2_ot2_scoring': quarter_scores[11] if len(quarter_scores) > 11 else None,
+        })
+    return processed_data
+
 # Define your routes
 @app.route('/')
 def home():
     conn = query.connect_to_database()
-    sql_query = f"""SELECT Team, MIN(Opp) AS Opponent, MIN(Result) AS Result 
+    sql_query = f"""SELECT Team, MIN(Opp) AS Opponent, MIN(Result) AS Result,
+                    MIN(q1_teamScoring) AS Q1, MIN(q2_teamScoring) AS Q2, MIN(q3_teamScoring) AS Q3, 
+                    MIN(q4_teamScoring) AS Q4, MIN(OT_teamScoring) AS OT, MIN(2OT_teamScoring) AS 2OT
                     FROM `last_5_games`
                     WHERE Date = "2024-03-20"
                     GROUP BY Team
                     ORDER BY Result DESC """
     results = query.execute_query(conn, sql_query)
+    merged_results = []
+
+# Iterate over each result
     for result in results:
-        for result2 in results:
-            if result[0] == result2[1]:
-                results.remove(result2)
-    return render_template('home.html', results = results, count = len(results))
+        matching_result = next((r for r in results if r[0] == result[1]), None)
+        if matching_result:
+            new_game = result + matching_result[3:]
+            merged_results.append(new_game)
+            
+            # results.remove(result)
+            results.remove(matching_result)
+    # print(merged_results)
+
+    new_results = process_data(merged_results)
+    return render_template('home.html', results = new_results, count = len(new_results))
+
+
 
 @app.route('/search', methods=['POST'])
 def search():
@@ -67,14 +110,15 @@ def gameInfo(team, opp):
                     AND (Team = "{team}" OR Team = "{opp}")
                     ORDER BY Team """
     teams = query.execute_query(conn, sql_query)
-    team1 = []
-    team2 = []
+    team1_info = []
+    team2_info = []
     for t in teams: 
         if(t[2] != team):
-            team2.append(t)
-        else: team1.append(t)
-
-    return render_template('gameInfo.html', team1 = team1, team2 = team2)
+            team2_info.append(t)
+        else: team1_info.append(t)
+    print(team1_info)
+    print(team2_info)
+    return render_template('gameInfo.html', team1_info = team1_info, team2 = team2_info, team = team, team2 = opp)
 
 if __name__ == '__main__':
     app.run(debug=True)

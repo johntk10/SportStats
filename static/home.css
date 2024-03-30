@@ -60,13 +60,43 @@ body {
     border: 1px solid #ccc;
     padding: 10px;
     margin: 10px;
-    width: 200px;
-    height: 100px;
+    width: 300px;
     background-color: #f9f9f9;
     display: inline-block;
+    flex-direction: column;
 }   
   
-  /* Additional styling for the content within the boxes */
-.box h2 {
-    margin-top: 0;
+.box h3, h4, .box p, a {
+    margin: 0;
+}
+
+.box .team-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* Align items vertically */
+}
+  
+.box .team-info h3 {
+    width: 60px; /* Adjust width as needed */
+}
+
+.box .team-info p {
+    padding: 0 10px;
+}
+
+.box .team-info:nth-child(2) a:last-child {
+    visibility: hidden;
+}
+
+.box .quarter-scoring {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* Align items vertically */
+}
+
+.box .quarter-scoring p {
+    padding: 3px 10px;
+}
+.box .quarter-scoring h4 {
+    width: 60px; /* Adjust width as needed */
 }
