@@ -12,6 +12,9 @@
    <div class seasonStats-table>
       <table> 
          <thead>
+            <tr class="header">
+               <th> Career Stats Per Season</th>
+            </tr>
             <tr> 
                <th scope ="col"> Season</th>
                <th scope ="col"> Pos</th>
@@ -63,6 +66,17 @@
                {% endfor %}
             {% endfor %}
          </tbody>
+         <tfoot>
+            <tr>
+               <th scope="row" data-stat="Season">Career Totals</th>
+               <th> </th>
+               <th> </th>
+
+               {% for sum in season_sums %}
+                  <th>{{ sum }}</th>
+               {% endfor %}
+            </tr>
+         </tfoot>
       </table>
    </div>
    <br> 
@@ -71,6 +85,9 @@
    <div class last5games_table>
       <table> 
          <thead>
+            <tr class="header">
+               <th> Last 5 Game Stats</th>
+            </tr>
             <tr> 
                <th scope ="col"> Date</th>
                <th scope ="col"> Team</th>
@@ -133,6 +150,20 @@
             </tr>
             {% endfor %}
          </tbody>
+         <tfoot>
+            <tr>
+               <th scope="row" data-stat="Season">Last 5 Average</th>
+               <th> </th>
+               <th> </th>
+               <th> </th>
+               <th> </th>
+
+               {% for sum in last5_sums %}
+                  <th>{{ sum }}</th>
+               {% endfor %}
+            </tr>
+         </tfoot>
+      </table>
    </div>
 
 </body>
