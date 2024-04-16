@@ -39,7 +39,7 @@ function showResults(query) {
             li.classList.add('search-result-item');
             li.addEventListener('click', () => {
                 // Redirect to a page
-                window.location.href = 'playerInfo/' + result; // Assuming the result is part of the URL
+                window.location.href = '/playerInfo/' + result; // Assuming the result is part of the URL
             });
             resultsContainer.appendChild(li);
         });

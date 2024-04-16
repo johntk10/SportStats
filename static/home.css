@@ -5,6 +5,25 @@ body {
     padding: 0;
 }
 
+
+
+.button2_y, .button2_t {
+    display: inline-block;
+    border: 1px solid #c9cbcd;
+    border-radius: 3px;
+    background-color: #efeeed;
+    font-size: .93em;
+    font-weight: normal;
+    margin: 0 8px 0 12px;
+    padding: 8px 12px;
+    width: auto;
+    text-align: center;
+    text-decoration: none
+}
+.button2_y:visited, .button2_t:visited {
+  color: blue;
+}
+
 .search-container {
     margin: 50px auto;
     width: 500px;
@@ -65,7 +84,9 @@ body {
     display: inline-block;
     flex-direction: column;
 }   
-  
+.yesterday-games h2 {
+    margin-left: 12px;
+}
 .box h3, h4, .box p, a {
     margin: 0;
 }

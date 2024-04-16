@@ -31,14 +31,14 @@ def process_data(raw_data):
         })
     return processed_data
 
-@app.route('/')
-def home():
+@app.route('/home/<date>')
+def home(date):
     conn = query.connect_to_database()
     sql_query = f"""SELECT Team, MIN(Opp) AS Opponent, MIN(Result) AS Result,
                     MIN(q1_teamScoring) AS Q1, MIN(q2_teamScoring) AS Q2, MIN(q3_teamScoring) AS Q3, 
                     MIN(q4_teamScoring) AS Q4, MIN(OT_teamScoring) AS OT, MIN(2OT_teamScoring) AS 2OT
                     FROM `last_5_games`
-                    WHERE Date = "2024-03-20"
+                    WHERE Date = "{date}"
                     GROUP BY Team
                     ORDER BY Result DESC """
     results = query.execute_query(conn, sql_query)
@@ -53,7 +53,7 @@ def home():
             results.remove(matching_result)
 
     new_results = process_data(merged_results)
-    return render_template('home.html', results = new_results, count = len(new_results))
+    return render_template('home.html', results = new_results, count = len(new_results), date = date)
 
 
 @app.route('/search', methods=['POST'])
@@ -82,7 +82,7 @@ def playerInfo(name):
     image_sql_query = f"""SELECT image_url FROM stats_23_24 
                         WHERE player = '{name}' """
     image_url = query.execute_query(conn, image_sql_query)
-    
+
     last_games_sql_query = f"""SELECT Date, Team, `@`, OPP, Result, MP, FG, FGA,
                                 `FG%`, 3P, 3PA, `3P%`, FT, FTA, `FT%`, 
                                 ORB, DRB, TRB, AST, STL, BLK, TOV, PF, PTS, GmSc, `+/-` FROM `last_5_games` 
@@ -123,11 +123,11 @@ def playerInfo(name):
                            five_games = five_games, season_sums = season_sums, last5_sums = last5_sums)
 
 
-@app.route('/gameInfo/<team>/vs/<opp>')
-def gameInfo(team, opp):
+@app.route('/gameInfo/<team>vs<opp>/<date>')
+def gameInfo(team, opp, date):
     conn = query.connect_to_database()
     sql_query = f"""SELECT * FROM `last_5_games`
-                    WHERE Date = "2024-03-20" 
+                    WHERE Date = "{date}"
                     AND (Team = "{team}" OR Team = "{opp}")
                     ORDER BY Team """
     teams = query.execute_query(conn, sql_query)

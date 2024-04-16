@@ -17,14 +17,19 @@
 
     <script type="text/javascript" src="{{ url_for('static', filename='index.js') }}"></script>
 
+    <div class="prev_next_dates">
+      <a href = "" class="button2_y"> Yesterday </a>
+      <a href = "" class="button2_t"> Tomorrow </a>
+    </div>
+
     <div class="yesterday-games"> 
-        <h2> {{count}} Games Yesterday </h2>
+        <h2> {{count}} Games  On {{date}} </h2>
         {% for result in results %}
         <div class="box">
             <div class="team-info">
                 <h3>{{ result.team1 }}</h3>
                 <p> {{ result.team1_score }}</p> 
-                <a href = "gameInfo/{{result.team1}}/vs/{{result.team2}}">{{ result.outcome }} </a> 
+                <a href = "/gameInfo/{{result.team1}}vs{{result.team2}}/{{date}}">{{ result.outcome }} </a> 
             </div>
             <div class="team-info">
                 <h3>{{ result.team2 }}</h3> 
@@ -73,29 +78,28 @@
           </div>
         </div>
         {% endfor %}
-        <!-- <table>
-            <thead>
-              <tr>
-                <th>Away Team</th>
-                <th>Away Score</th>
-                <th>Home Team</th>
-                <th>Home Score</th>
-                <th>Outcome</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for game in results %}
-              <tr>
-                <td>{{ game.away_team }}</td>
-                <td>{{ game.away_score }}</td>
-                <td>{{ game.home_team }}</td>
-                <td>{{ game.home_score }}</td>
-                <td>{{ game.outcome }}</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table> -->
-
     </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        var url = window.location.href;
+        var currentDate = url.split("/").pop(); // Get the last part of the URL as the current date (e.g., "2024-03-20")
+        // console.log(currentDate)
+        // Get the elements with class "button2_y" and "button2_t"
+        var yesterdayButton = document.querySelector(".button2_y");
+        var tomorrowButton = document.querySelector(".button2_t");
+
+        // Calculate the date for yesterday and tomorrow
+        var yesterdayDate = new Date(currentDate);
+        yesterdayDate.setDate(yesterdayDate.getDate() - 1); // Previous day
+        var tomorrowDate = new Date(currentDate);
+        tomorrowDate.setDate(tomorrowDate.getDate() + 1); // Next day
+
+        // Set the href attributes for yesterday and tomorrow buttons
+        yesterdayButton.setAttribute("href", "/home/" + yesterdayDate.toISOString().slice(0, 10));
+        tomorrowButton.setAttribute("href", "/home/" + tomorrowDate.toISOString().slice(0, 10));
+      });
+    </script>
+      
 </body>
 </html>

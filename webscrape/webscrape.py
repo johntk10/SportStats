@@ -5,12 +5,6 @@ import modules.query as q
 from sqlalchemy import create_engine
 
     
-username = 'eric'
-password = 'nomeat555'
-host = '96.38.123.26'  # or your host, e.g., '127.0.0.1'
-database = 'basketballstats'
-
-
 
 def getTable():
 # URL of the NBA players statistics page on Basketball-Reference
@@ -44,19 +38,94 @@ def getTable():
         df = pd.DataFrame(player_data, columns=headers)
         
 
+        username = 'eric'
+        password = 'nomeat555'
+        host = '96.38.123.26'  # or your host, e.g., '127.0.0.1'
+        database = 'basketballstats'
+
         # Create a MySQL engine
         engine = create_engine(f'mysql+pymysql://{username}:{password}@{host}/{database}')
 
-        df.to_sql('stats_23-24', con=engine, if_exists='replace', index=False)
+        df.to_sql('stats_23_24', con=engine, if_exists='replace', index=False)
 
-# def scrape_image_url(player_url):
-#     response = requests.get(player_url)
-#     if response.status_code == 200:
-#         soup = BeautifulSoup(response.content, 'html.parser')
-#         og_image_tag = soup.find("meta", property="og:image")
-#         if og_image_tag:
-#             return og_image_tag["content"]
-#     return None
+
+def update_table():
+    url = 'https://www.basketball-reference.com/leagues/NBA_2024_per_game.html'
+
+    # Send a GET request to the URL
+    response = requests.get(url)
+
+    # Check if the request was successful (status code 200)
+    if response.status_code == 200:
+        # Parse the HTML content of the page
+        soup = BeautifulSoup(response.content, 'html.parser')
+        
+        # Find the table containing player statistics
+        table = soup.find('table', {'id': 'per_game_stats'})
+
+        headers = [th.text.strip() for th in table.find('thead').find_all('th')]
+        
+        # Initialize an empty list to store player data
+        player_data = []
+        
+        # Iterate over rows in the table body
+        for row in table.find('tbody').find_all('tr'):
+            # Extract data from each cell in the row
+            player_row = [td.text.strip() for td in row.find_all(['th', 'td'])]
+            # Add player data to the list
+            player_data.append(player_row)
+        
+        # Convert the list of player data into a DataFrame
+        # df = pd.DataFrame(player_data, columns=headers)
+        conn = q.connect_to_database()
+        cursor = conn.cursor()
+        for row in player_data:
+            RK = row[0]
+            print(RK)
+            sql_query = f""" UPDATE basketballstats.stats_23_24
+                SET 
+                    Player = '{row[1]}',
+                    Pos = '{row[2]}',
+                    Age = {row[3]},
+                    Tm = '{row[4]}',
+                    G = {row[5]},
+                    GS = {row[6]},
+                    MP = {row[7]},
+                    FG = {row[8]},
+                    FGA = {row[9]},
+                    `FG%` = {row[10]},
+                    3P = {row[11]},
+                    3PA = {row[12]},
+                    `3P%` = {row[13]},
+                    2P = {row[14]},
+                    2PA = {row[15]},
+                    `2P%` = {row[16]},
+                    `eFG%` = {row[17]},
+                    FT = {row[18]},
+                    FTA = {row[19]},
+                    `FT%` = {row[20]},
+                    ORB = {row[21]},
+                    DRB = {row[22]},
+                    TRB = {row[23]},
+                    AST = {row[24]},
+                    STL = {row[25]},
+                    BLK = {row[26]},
+                    TOV = {row[27]},
+                    PF = {row[28]},
+                    PTS = {row[29]}
+
+                WHERE RK = {RK}"""
+        
+            cursor.execute(sql_query)
+
+
+        # Commit changes
+        conn.commit()
+
+        # Close connection
+        cursor.close()
+        conn.close()
+
 
 def add_image():
     url = 'https://www.basketball-reference.com/leagues/NBA_2024_per_game.html'
@@ -85,7 +154,7 @@ def add_image():
             else:
                 player_name = None
                 image_url = None
-            print(player_name)
+            # print(player_name)
             
             conn = q.connect_to_database()
             sql_query = f"""UPDATE basketballstats.stats_23_24 
@@ -104,7 +173,7 @@ def add_image():
 
 
 def getLineScore(): 
-    url = "https://www.basketball-reference.com/boxscores/?month=03&day=8&year=2024"
+    url = "https://www.basketball-reference.com/boxscores/?month=04&day=3&year=2024"
     response = requests.get(url)
     #print(response.status_code)
 # Check if the request was successful (status code 200)
@@ -140,7 +209,7 @@ def getLineScore():
                     conn = q.connect_to_database()
                     sql_query = f"""UPDATE basketballstats.last_5_games
                                 SET {quarter} = "{score}"
-                                WHERE Date = "2024-03-08" 
+                                WHERE Date = "2024-04-03" 
                                 AND Team = "{team}" AND {quarter} IS NULL"""
                 
                     cursor = conn.cursor()
@@ -163,7 +232,6 @@ def getLineScore():
                 # conn.commit()
                 # cursor.close()
                 # conn.close()
+    else: 
+        print("fail")
 
-
-
-        

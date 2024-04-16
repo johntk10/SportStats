@@ -1,8 +1,13 @@
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
+import modules.query as q
 from sqlalchemy import create_engine
 import time
+from datetime import datetime
+import mysql.connector
+
+
 
 # Function to get the last 5 games for a single player
 def get_last_5_games(player_id):
@@ -26,6 +31,95 @@ def get_last_5_games(player_id):
                 player_data.append(player_row)
         return player_data
     return []
+
+def update_yesterday_game():
+    url = "https://www.basketball-reference.com/boxscores/"
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.content, 'html.parser')
+        div_elements = soup.find_all('table', class_='teams')
+        # print(div_elements)
+        for div in div_elements:
+            a_tags = div.find_all('a', href=True)
+            for index, tag in enumerate(a_tags):
+                href = tag['href']
+                if index == 0:  # First <a> tag
+                    team1_name = href.split('/')[2]  # Extract the value after "teams/"
+                    print("Value after 'teams/' in first href:", team1_name)
+                elif index == 1:  # Second <a> tag
+                    page_link = href
+                    print("Whole link for second href:", page_link)
+                elif index == 2:  # Third <a> tag
+                    team2_name = href.split('/')[2]  # Extract the value after "teams/"
+                    print("Value after 'teams/' in third href:", team2_name)
+            time.sleep(3)
+            url = "https://www.basketball-reference.com" + page_link
+            # print(url)
+            response = requests.get(url)
+            if response.status_code == 200:
+                soup = BeautifulSoup(response.content, 'html.parser')
+                team1_table_id = "box-{}-game-basic".format(team1_name)
+                team2_table_id = "box-{}-game-basic".format(team2_name)
+
+                team1_table = soup.find('table', id= team1_table_id)
+                team2_table = soup.find('table', id=team2_table_id)
+                # header1 = [th.text.strip() for th in team1_table.find('thead').find_all('th')]
+                # header2 = [th.text.strip() for th in team2_table.find('thead').find_all('th')]
+
+                player_data_team1 = []
+                player_data_team2 = []
+                today_date = datetime.today().strftime('%Y-%m-%d')
+                team1_score = team1_table.find('tfoot').find(['th', 'td'], attrs={'data-stat': 'pts'}).get_text(strip=True)
+                team2_score = team2_table.find('tfoot').find(['th', 'td'], attrs={'data-stat': 'pts'}).get_text(strip=True)
+                if team1_score > team2_score:
+                    team1_score_string = 'W ' + team1_score + '-' + team2_score
+                    team2_score_string = 'L ' + team2_score + '-' + team1_score
+                else:
+                    team1_score_string = 'L ' + team1_score + '-' + team2_score
+                    team2_score_string = 'W ' + team2_score + '-' + team1_score
+
+                other_data_team1 = [today_date, team1_name, '@', team2_name, team1_score_string, '*']
+                other_data_team2 = [today_date, team2_name, '', team1_name, team2_score_string, '*']
+               
+                for row in team1_table.find('tbody').find_all('tr'):
+                    player_row = [td.text.strip() for td in row.find_all(['th', 'td'])]
+                    if "Did Not Play" in player_row or "Did Not Dress" in player_row:
+                        continue
+                    updated_row = player_row[:1] + other_data_team1 + player_row[1:] + [None] * 6
+                    player_data_team1.append(updated_row)
+                for row in team2_table.find('tbody').find_all('tr'):
+                    player_row = [td.text.strip() for td in row.find_all(['th', 'td'])]
+                    if "Did Not Play" in player_row or "Did Not Dress" in player_row:
+                        continue
+
+                    updated_row = player_row[:1] + other_data_team2 + player_row[1:] + [None] * 6
+                    player_data_team2.append(updated_row)
+
+                total_data = player_data_team1 + player_data_team2
+                headers = ['Player', 'Date', 'Team', '`@`', 'Opp', 'Result', 'GS', 'MP', 'FG', 'FGA', '`FG%`', 
+                           '3P', '3PA', '`3P%`', 'FT', 'FTA', '`FT%`', 'ORB', 'DRB', 'TRB', 'AST', 'STL', 
+                           'BLK', 'TOV', 'PF', 'PTS', '`+/-`', 'q1_teamScoring', 'q2_teamScoring', 'q3_teamScoring',
+                            'q4_teamScoring', 'OT_teamScoring', '2OT_teamScoring']
+                print(total_data)
+                conn = q.connect_to_database()
+                cursor = conn.cursor()
+                sql_query = f""" INSERT INTO basketballstats.last_5_games
+                                ({', '.join(headers)}) VALUES
+                                ({', '.join(['%s'] * len(headers))}) """
+                for row in total_data:
+                    cursor.execute(sql_query, row)
+                    
+                
+                conn.commit()
+                cursor.close()
+                conn.close()
+
+
+                                    
+
+# update_yesterday_game()
+
 
 # Initialize an empty list to store all players' data
 all_players_data = []
@@ -63,4 +157,4 @@ engine = create_engine(f'mysql+pymysql://{username}:{password}@{host}/{database}
 
 
 # Save the DataFrame to SQL
-df.to_sql('last_5_games', con=engine, if_exists='replace', index=False)
+df.to_sql('new_last_5_games', con=engine, if_exists='replace', index=False)
