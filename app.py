@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, redirect, url_for
+from datetime import date, timedelta
 import modules.query as query 
 
 app = Flask(__name__)
@@ -30,6 +31,11 @@ def process_data(raw_data):
             'team2_ot2_scoring': quarter_scores[11] if len(quarter_scores) > 11 else None,
         })
     return processed_data
+
+@app.route('/')
+def index():
+    y_date = (date.today() - timedelta(days=1)).strftime("%Y-%m-%d")
+    return redirect(url_for('home', date=y_date))
 
 @app.route('/home/<date>')
 def home(date):
@@ -85,14 +91,14 @@ def playerInfo(name):
 
     last_games_sql_query = f"""SELECT Date, Team, `@`, OPP, Result, MP, FG, FGA,
                                 `FG%`, 3P, 3PA, `3P%`, FT, FTA, `FT%`, 
-                                ORB, DRB, TRB, AST, STL, BLK, TOV, PF, PTS, GmSc, `+/-` FROM `last_5_games` 
+                                ORB, DRB, TRB, AST, STL, BLK, TOV, PF, PTS, `+/-` FROM `last_5_games` 
                                 WHERE player = "{name}" """
     
     five_games = query.execute_query(conn, last_games_sql_query)
     full_image_url = "http://cdn.ssref.net/scripts/image_resize.cgi?min=200&url=" + image_url[0][0]
 
     season_sums = [0] * 17
-    last5_sums = [0] * 21
+    last5_sums = [0] * 20
     k = 1
     games = 0
 
@@ -112,8 +118,16 @@ def playerInfo(name):
 
     for value in five_games:
         for val in value[5:]:
-            last5_sums[k] += float(val or 0) 
-            k+=1
+            # If the value is a time string (e.g., "35:40")
+            if ':' in val:
+                minutes, seconds = map(int, val.split(':'))
+                # Round up the minutes if seconds >= 30
+                if seconds >= 30:
+                    minutes += 1
+                last5_sums[k] += minutes
+            else:
+                last5_sums[k] += float(val)
+            k += 1
         k = 0
 
     for j in range(len(last5_sums)):
@@ -138,25 +152,27 @@ def gameInfo(team, opp, date):
             team2_info.append(t)
         else: team1_info.append(t)
 
-    team1_sums = [0] * 21
-    team2_sums = [0] * 21
+    team1_sums = [0] * 20
+    team2_sums = [0] * 20
 
     for row in team1_info:
-        for i in range(21):
+        for i in range(20):
+            if i == 0: continue
             if i == 3 or i == 6 or i == 9 or i == 19: team1_sums[i] += float(row[i + 7] or 0) 
             else: team1_sums[i] += int(row[i + 7] or 0)  
 
-    # team1_sums[0] = 240
+    team1_sums[0] = 240
     team1_sums[3] = round(team1_sums[1] / team1_sums[2], 3)
     team1_sums[6] = round(team1_sums[4] / team1_sums[5], 3)
     team1_sums[9] = round(team1_sums[7] / team1_sums[8], 3)
 
     for row in team2_info:
-        for i in range(21):
+        for i in range(20):
+            if i == 0: continue;
             if i == 3 or i == 6 or i == 9 or i == 19: team2_sums[i] += float(row[i + 7] or 0) 
             else: team2_sums[i] += int(row[i + 7] or 0)  
 
-    # team2_sums[0] = 240
+    team2_sums[0] = 240
     team2_sums[3] = round(team2_sums[1] / team2_sums[2], 3)
     team2_sums[6] = round(team2_sums[4] / team2_sums[5], 3)
     team2_sums[9] = round(team2_sums[7] / team2_sums[8], 3)

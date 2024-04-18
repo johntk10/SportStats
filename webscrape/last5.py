@@ -4,9 +4,8 @@ import pandas as pd
 import modules.query as q
 from sqlalchemy import create_engine
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 import mysql.connector
-
 
 
 # Function to get the last 5 games for a single player
@@ -31,6 +30,7 @@ def get_last_5_games(player_id):
                 player_data.append(player_row)
         return player_data
     return []
+
 
 def update_yesterday_game():
     url = "https://www.basketball-reference.com/boxscores/"
@@ -69,7 +69,7 @@ def update_yesterday_game():
 
                 player_data_team1 = []
                 player_data_team2 = []
-                today_date = datetime.today().strftime('%Y-%m-%d')
+                today_date = (datetime.today() -  timedelta(days=1)).strftime('%Y-%m-%d')
                 team1_score = team1_table.find('tfoot').find(['th', 'td'], attrs={'data-stat': 'pts'}).get_text(strip=True)
                 team2_score = team2_table.find('tfoot').find(['th', 'td'], attrs={'data-stat': 'pts'}).get_text(strip=True)
                 if team1_score > team2_score:
@@ -84,13 +84,13 @@ def update_yesterday_game():
                
                 for row in team1_table.find('tbody').find_all('tr'):
                     player_row = [td.text.strip() for td in row.find_all(['th', 'td'])]
-                    if "Did Not Play" in player_row or "Did Not Dress" in player_row:
+                    if "Did Not Play" in player_row or "Did Not Dress" in player_row or player_row[0] == 'Reserves':
                         continue
                     updated_row = player_row[:1] + other_data_team1 + player_row[1:] + [None] * 6
                     player_data_team1.append(updated_row)
                 for row in team2_table.find('tbody').find_all('tr'):
                     player_row = [td.text.strip() for td in row.find_all(['th', 'td'])]
-                    if "Did Not Play" in player_row or "Did Not Dress" in player_row:
+                    if "Did Not Play" in player_row or "Did Not Dress" in player_row or player_row[0] == 'Reserves':
                         continue
 
                     updated_row = player_row[:1] + other_data_team2 + player_row[1:] + [None] * 6
@@ -116,45 +116,62 @@ def update_yesterday_game():
                 conn.close()
 
 
+def remove_the_oldest_game():
+    conn = q.connect_to_database()
+    sql_query = f"""DELETE t1
+                    FROM basketballstats.last_5_games t1
+                    JOIN (
+                        SELECT Player, MIN(STR_TO_DATE(Date, '%Y-%m-%d')) AS min_date
+                        FROM basketballstats.last_5_games
+                        GROUP BY Player
+                        HAVING COUNT(*) >= 6
+                    ) t2 ON t1.Player = t2.Player AND STR_TO_DATE(t1.Date, '%Y-%m-%d') = t2.min_date"""
+    
+    cursor = conn.cursor()
+    cursor.execute(sql_query)
+    conn.commit()
+    cursor.close()
+    conn.close()
                                     
 
 # update_yesterday_game()
+# remove_the_oldest_game()
 
 
-# Initialize an empty list to store all players' data
-all_players_data = []
+# # Initialize an empty list to store all players' data
+# all_players_data = []
 
-# Column headers, adjust according to the actual table you're scraping
-headers = ['Player', 'Date', 'Team', '@', 'Opp', 'Result', 'GS', 'MP', 'FG', 'FGA', 'FG%', '3P', '3PA', '3P%', 'FT', 'FTA', 'FT%', 'ORB', 'DRB', 'TRB', 'AST', 'STL', 'BLK', 'TOV', 'PF', 'PTS', 'GmSc', '+/-']
-print(len(headers))
+# # Column headers, adjust according to the actual table you're scraping
+# headers = ['Player', 'Date', 'Team', '@', 'Opp', 'Result', 'GS', 'MP', 'FG', 'FGA', 'FG%', '3P', '3PA', '3P%', 'FT', 'FTA', 'FT%', 'ORB', 'DRB', 'TRB', 'AST', 'STL', 'BLK', 'TOV', 'PF', 'PTS', 'GmSc', '+/-']
+# print(len(headers))
 
-player_ids = []
-with open('active_player_ids.txt', 'r') as file:  # Ensure the file is named 'player_ids.txt' and located in the correct directory
-    player_ids = [line.strip() for line in file.readlines()]
+# player_ids = []
+# with open('active_player_ids.txt', 'r') as file:  # Ensure the file is named 'player_ids.txt' and located in the correct directory
+#     player_ids = [line.strip() for line in file.readlines()]
 
-#print(player_ids)
+# #print(player_ids)
 
-for player_id in player_ids:
-    player_games = get_last_5_games(player_id)
-    #print(player_games)
-    for game in player_games:
-        all_players_data.append([player_id] + game)  # Add player ID to each game data
-        print(all_players_data)
-print(all_players_data)
+# for player_id in player_ids:
+#     player_games = get_last_5_games(player_id)
+#     #print(player_games)
+#     for game in player_games:
+#         all_players_data.append([player_id] + game)  # Add player ID to each game data
+#         print(all_players_data)
+# print(all_players_data)
 
-# Convert the list of player data into a DataFrame
-df = pd.DataFrame(all_players_data, columns=headers)
+# # Convert the list of player data into a DataFrame
+# df = pd.DataFrame(all_players_data, columns=headers)
 
-# Database connection parameters
+# # Database connection parameters
 
-username = 'eric'
-password = 'nomeat555'
-host = '96.38.123.26'  # or your host, e.g., '127.0.0.1'
-database = 'basketballstats'
+# username = 'eric'
+# password = 'nomeat555'
+# host = '96.38.123.26'  # or your host, e.g., '127.0.0.1'
+# database = 'basketballstats'
 
-# Create a MySQL engine
-engine = create_engine(f'mysql+pymysql://{username}:{password}@{host}/{database}')
+# # Create a MySQL engine
+# engine = create_engine(f'mysql+pymysql://{username}:{password}@{host}/{database}')
 
 
-# Save the DataFrame to SQL
-df.to_sql('new_last_5_games', con=engine, if_exists='replace', index=False)
+# # Save the DataFrame to SQL
+# df.to_sql('new_last_5_games', con=engine, if_exists='replace', index=False)

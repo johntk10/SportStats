@@ -49,7 +49,7 @@ def getTable():
         df.to_sql('stats_23_24', con=engine, if_exists='replace', index=False)
 
 
-def update_table():
+def update_season_table():#idk if works
     url = 'https://www.basketball-reference.com/leagues/NBA_2024_per_game.html'
 
     # Send a GET request to the URL
@@ -173,7 +173,7 @@ def add_image():
 
 
 def getLineScore(): 
-    url = "https://www.basketball-reference.com/boxscores/?month=04&day=3&year=2024"
+    url = "https://www.basketball-reference.com/boxscores/?month=04&day=16&year=2024"
     response = requests.get(url)
     #print(response.status_code)
 # Check if the request was successful (status code 200)
@@ -209,7 +209,7 @@ def getLineScore():
                     conn = q.connect_to_database()
                     sql_query = f"""UPDATE basketballstats.last_5_games
                                 SET {quarter} = "{score}"
-                                WHERE Date = "2024-04-03" 
+                                WHERE Date = "2024-04-16" 
                                 AND Team = "{team}" AND {quarter} IS NULL"""
                 
                     cursor = conn.cursor()
@@ -234,4 +234,7 @@ def getLineScore():
                 # conn.close()
     else: 
         print("fail")
+
+
+# getLineScore()
 

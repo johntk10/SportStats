@@ -84,7 +84,6 @@
       document.addEventListener("DOMContentLoaded", function() {
         var url = window.location.href;
         var currentDate = url.split("/").pop(); // Get the last part of the URL as the current date (e.g., "2024-03-20")
-        // console.log(currentDate)
         // Get the elements with class "button2_y" and "button2_t"
         var yesterdayButton = document.querySelector(".button2_y");
         var tomorrowButton = document.querySelector(".button2_t");
@@ -97,7 +96,17 @@
 
         // Set the href attributes for yesterday and tomorrow buttons
         yesterdayButton.setAttribute("href", "/home/" + yesterdayDate.toISOString().slice(0, 10));
-        tomorrowButton.setAttribute("href", "/home/" + tomorrowDate.toISOString().slice(0, 10));
+
+        var todayDate = new Date().toISOString().slice(0, 10);
+        var oneDayBeforeToday = new Date();
+        oneDayBeforeToday.setDate(oneDayBeforeToday.getDate() - 1);
+        var oneDayBeforeTodayDate = oneDayBeforeToday.toISOString().slice(0, 10);
+        if (currentDate === oneDayBeforeTodayDate) {
+          tomorrowButton.style.display = "none";
+        } else {
+          tomorrowButton.setAttribute("href", "/home/" + tomorrowDate.toISOString().slice(0, 10));
+        }
+
       });
     </script>
       
