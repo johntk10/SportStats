@@ -8,11 +8,12 @@ from sqlalchemy import create_engine
 
 def getTable():
 # URL of the NBA players statistics page on Basketball-Reference
-    url = 'https://www.basketball-reference.com/leagues/NBA_2024_per_game.html'
+    url = 'https://web.archive.org/web/20220630093847/https://www.basketball-reference.com/leagues/NBA_2000_per_game.html'
 
     # Send a GET request to the URL
     response = requests.get(url)
 
+    print(response.status_code)
     # Check if the request was successful (status code 200)
     if response.status_code == 200:
         # Parse the HTML content of the page
@@ -46,7 +47,7 @@ def getTable():
         # Create a MySQL engine
         engine = create_engine(f'mysql+pymysql://{username}:{password}@{host}/{database}')
 
-        df.to_sql('stats_23_24', con=engine, if_exists='replace', index=False)
+        df.to_sql('stats_99_0', con=engine, if_exists='replace', index=False)
 
 
 def update_season_table():#idk if works
@@ -128,7 +129,7 @@ def update_season_table():#idk if works
 
 
 def add_image():
-    url = 'https://www.basketball-reference.com/leagues/NBA_2024_per_game.html'
+    url = 'https://web.archive.org/web/20240214132654/https://www.basketball-reference.com/leagues/NBA_2005_per_game.html'
 
 # Send a GET request to the URL
     response = requests.get(url)
@@ -154,10 +155,10 @@ def add_image():
             else:
                 player_name = None
                 image_url = None
-            # print(player_name)
+            print(player_name)
             
             conn = q.connect_to_database()
-            sql_query = f"""UPDATE basketballstats.stats_23_24 
+            sql_query = f"""UPDATE basketballstats.stats_4_5 
                 SET image_url = '{image_url}'
                 WHERE player = "{player_name}" AND image_url IS NULL """
             
@@ -173,7 +174,7 @@ def add_image():
 
 
 def getLineScore(): 
-    url = "https://www.basketball-reference.com/boxscores/?month=04&day=16&year=2024"
+    url = "https://www.basketball-reference.com/boxscores/?month=04&day=17&year=2024"
     response = requests.get(url)
     #print(response.status_code)
 # Check if the request was successful (status code 200)
@@ -209,7 +210,7 @@ def getLineScore():
                     conn = q.connect_to_database()
                     sql_query = f"""UPDATE basketballstats.last_5_games
                                 SET {quarter} = "{score}"
-                                WHERE Date = "2024-04-16" 
+                                WHERE Date = "2024-04-17" 
                                 AND Team = "{team}" AND {quarter} IS NULL"""
                 
                     cursor = conn.cursor()
@@ -237,4 +238,4 @@ def getLineScore():
 
 
 # getLineScore()
-
+add_image()

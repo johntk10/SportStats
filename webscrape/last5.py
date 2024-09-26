@@ -84,13 +84,13 @@ def update_yesterday_game():
                
                 for row in team1_table.find('tbody').find_all('tr'):
                     player_row = [td.text.strip() for td in row.find_all(['th', 'td'])]
-                    if "Did Not Play" in player_row or "Did Not Dress" in player_row or player_row[0] == 'Reserves':
+                    if "Did Not Play" in player_row or "Did Not Dress" in player_row or "Not With Team" in player_row or player_row[0] == 'Reserves':
                         continue
                     updated_row = player_row[:1] + other_data_team1 + player_row[1:] + [None] * 6
                     player_data_team1.append(updated_row)
                 for row in team2_table.find('tbody').find_all('tr'):
                     player_row = [td.text.strip() for td in row.find_all(['th', 'td'])]
-                    if "Did Not Play" in player_row or "Did Not Dress" in player_row or player_row[0] == 'Reserves':
+                    if "Did Not Play" in player_row or "Did Not Dress" in player_row or "Not With Team" in player_row or player_row[0] == 'Reserves':
                         continue
 
                     updated_row = player_row[:1] + other_data_team2 + player_row[1:] + [None] * 6

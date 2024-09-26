@@ -101,6 +101,7 @@
         var oneDayBeforeToday = new Date();
         oneDayBeforeToday.setDate(oneDayBeforeToday.getDate() - 1);
         var oneDayBeforeTodayDate = oneDayBeforeToday.toISOString().slice(0, 10);
+        // console.log(todayDate)
         if (currentDate === oneDayBeforeTodayDate) {
           tomorrowButton.style.display = "none";
         } else {

@@ -7,7 +7,7 @@
 </head>
 <body>
    <!-- {{ results }} -->
-   <img src="{{ image }}">
+   <img src="{{ image }}" width = "200" height = "200">
    <a> {{ name }} </a>
    <div class seasonStats-table>
       <table> 
@@ -83,6 +83,7 @@
    <br>
    <br>
    <div class last5games_table>
+      {% if five_games | length > 0 %}
       <table> 
          <thead>
             <tr class="header">
@@ -162,6 +163,10 @@
             </tr>
          </tfoot>
       </table>
+      {% else %}
+         <p>No game data available.</p>
+      {% endif %}
+
    </div>
 
 </body>

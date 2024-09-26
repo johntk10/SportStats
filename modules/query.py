@@ -25,17 +25,34 @@ def execute_query(conn, query):
         print("Error executing query:", err)
 
 def name_search(name):
+    tables = [
+    'stats_23_24', 'stats_22_23', 'stats_21_22', 'stats_20_21', 'stats_19_20',
+    'stats_18_19', 'stats_17_18', 'stats_16_17', 'stats_15_16', 'stats_14_15',
+    'stats_13_14', 'stats_12_13', 'stats_11_12', 'stats_10_11', 'stats_9_10',
+    'stats_8_9', 'stats_7_8', 'stats_6_7', 'stats_5_6', 'stats_4_5', 
+    'stats_3_4', 'stats_2_3', 'stats_1_2', 'stats_0_1', 'stats_99_0']
+
+    subqueries = []
+
+    for table in tables:
+        subquery = f"""
+            SELECT Player, MAX(PTS) AS PTS
+            FROM {table}
+            WHERE Player LIKE '{name}%'
+            GROUP BY Player """
+
+        subqueries.append(subquery)
+
+    union_query = " UNION ".join(subqueries)
+
     sql_query = f"""
         SELECT Player
-            FROM (
-                SELECT DISTINCT Player, MAX(PTS) AS PTS
-                FROM stats_23_24
-                WHERE Player LIKE '{name}%'
-                GROUP BY Player
-            ) AS SUB
-        ORDER BY CAST(PTS AS SIGNED) DESC LIMIT 10;
-    """
-    
+        FROM (
+            {union_query}
+        ) AS SUB
+        GROUP BY Player
+        ORDER BY CAST(MAX(PTS) AS SIGNED) DESC
+        LIMIT 10; """
 
     conn = connect_to_database()
 

@@ -71,22 +71,24 @@ def search():
 
 @app.route('/playerInfo/<name>')
 def playerInfo(name):
-    tables = ['stats_23_24', 'stats_22_23', 'stats_21_22', 
-             'stats_20_21', 'stats_19_20', 'stats_18_19', 
-             'stats_17_18', 'stats_16_17', 'stats_15_16', 'stats_14_15']
+    tables = ['stats_23_24', 'stats_22_23', 'stats_21_22', 'stats_20_21', 'stats_19_20', 'stats_18_19', 
+              'stats_17_18', 'stats_16_17', 'stats_15_16', 'stats_14_15', 'stats_13_14', 'stats_12_13', 
+              'stats_11_12', 'stats_10_11', 'stats_9_10', 'stats_8_9', 'stats_7_8', 'stats_6_7', 
+              'stats_5_6', 'stats_4_5', 'stats_3_4', 'stats_2_3','stats_1_2', 'stats_0_1', 'stats_99_0']
     all_results = {}
     conn = query.connect_to_database()
     for table in tables:
         sql_query = f"""SELECT Pos, Tm, G, MP, FG, FGA,
                         `FG%`, 3P, 3PA, `3P%`, FT, FTA, `FT%`, 
                         TRB, AST, STL, BLK, TOV, PTS FROM {table}
-                        WHERE player = "{name}" AND Tm != 'Tot' """
+                        WHERE player = "{name}" AND Tm != 'Tot' """ # instead of tot, its 2Tm or 3Tm ect for new tables
                   
         results = query.execute_query(conn, sql_query)
         all_results[table] = results
 
     image_sql_query = f"""SELECT image_url FROM stats_23_24 
                         WHERE player = '{name}' """
+    image_url = None
     image_url = query.execute_query(conn, image_sql_query)
 
     last_games_sql_query = f"""SELECT Date, Team, `@`, OPP, Result, MP, FG, FGA,
@@ -95,43 +97,58 @@ def playerInfo(name):
                                 WHERE player = "{name}" """
     
     five_games = query.execute_query(conn, last_games_sql_query)
-    full_image_url = "http://cdn.ssref.net/scripts/image_resize.cgi?min=200&url=" + image_url[0][0]
+
+    full_image_url = None
+    if(image_url): full_image_url = "http://cdn.ssref.net/scripts/image_resize.cgi?min=200&url=" + image_url[0][0]
+    else: full_image_url = "https://cdn-icons-png.flaticon.com/512/10701/10701484.png"
 
     season_sums = [0] * 17
     last5_sums = [0] * 20
     k = 1
     games = 0
 
-    for key, value in all_results.items():
+    for key, value in all_results.items(): # check if this properly calculates average
         for item in value:
             games += int(item[2])
             for val in item[3:]:
-                season_sums[k] += float(float(val) * int(item[2]) or 0) 
+                if(k == 4 or k == 7 or k == 10): 
+                    k+=1
+                    continue
+
+                else :season_sums[k] += float(float(val) * int(item[2]) or 0) 
                 k+=1
             k = 1
 
     for i in range(len(season_sums)):
-        season_sums[i] = "{:.3g}".format(season_sums[i] / games)
+        if i in [4, 7, 10]: season_sums[i] = round(season_sums[i-2] / season_sums[i-1], 2)
+        else : season_sums[i] = round(season_sums[i] / games, 2)
 
     season_sums[0] = games
     k = 0
+    if(five_games):
+        for value in five_games: 
+            for val in value[5:]:
+                if(k == 3 or k == 6 or k == 9): 
+                    k+=1
+                    continue
+                # If the value is a time string (e.g., "35:40")
+                if ':' in val:
+                    minutes, seconds = map(int, val.split(':'))
+                    # Round up the minutes if seconds >= 30
+                    if seconds >= 30:
+                        minutes += 1
+                    last5_sums[k] += minutes
+                else:
+                    last5_sums[k] += float(val)
+                k += 1
+            k = 0
 
-    for value in five_games:
-        for val in value[5:]:
-            # If the value is a time string (e.g., "35:40")
-            if ':' in val:
-                minutes, seconds = map(int, val.split(':'))
-                # Round up the minutes if seconds >= 30
-                if seconds >= 30:
-                    minutes += 1
-                last5_sums[k] += minutes
-            else:
-                last5_sums[k] += float(val)
-            k += 1
-        k = 0
-
-    for j in range(len(last5_sums)):
-        last5_sums[j] = round(last5_sums[j] / len(five_games), 3)
+        for j in range(len(last5_sums)):
+            if( j == 3 or j == 6 or j == 9): 
+                if(last5_sums[j-1] != 0):
+                    last5_sums[j] = round(last5_sums[j-2] / last5_sums[j-1], 3)
+                else : last5_sums[j] = 'NA'
+            else: last5_sums[j] = round(last5_sums[j] / len(five_games), 3)
     
     return render_template('playerInfo.html', total_stats = all_results, image = full_image_url, name = name,
                            five_games = five_games, season_sums = season_sums, last5_sums = last5_sums)
