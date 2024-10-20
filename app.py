@@ -52,13 +52,15 @@ def home(date):
 
 # Iterate over each result
     for result in results:
+        print("here")
         matching_result = next((r for r in results if r[0] == result[1]), None)
         if matching_result:
             new_game = result + matching_result[3:]
             merged_results.append(new_game)
             results.remove(matching_result)
-
+    print(merged_results)
     new_results = process_data(merged_results)
+    print(new_results)
     return render_template('home.html', results = new_results, count = len(new_results), date = date)
 
 
@@ -149,6 +151,8 @@ def playerInfo(name):
                     last5_sums[j] = round(last5_sums[j-2] / last5_sums[j-1], 3)
                 else : last5_sums[j] = 'NA'
             else: last5_sums[j] = round(last5_sums[j] / len(five_games), 3)
+    
+    print(all_results)
     
     return render_template('playerInfo.html', total_stats = all_results, image = full_image_url, name = name,
                            five_games = five_games, season_sums = season_sums, last5_sums = last5_sums)
